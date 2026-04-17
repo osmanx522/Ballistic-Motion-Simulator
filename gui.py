@@ -2,6 +2,9 @@
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import pyqtSignal
 
+from engine import PhysicsEngine
+from graphics import SimulationGraph
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -49,6 +52,7 @@ class FirstPage(QWidget):
         self.first_spinbox = QDoubleSpinBox()
         self.second_spinbox = QDoubleSpinBox()
         self.start_button = QPushButton("Simülasyonu Başlat")
+        self.simulation_graph = SimulationGraph()
 
         #gridlayout
         self.grid_layout.addWidget(self.first_label, 0, 0)
@@ -59,12 +63,20 @@ class FirstPage(QWidget):
 
         #button
         self.main_layout.addWidget(self.start_button)
+
+        #simulationgraph
+        self.main_layout.addWidget(self.simulation_graph)
+
         self.start_button.clicked.connect(self.func_start_button)
+
+        self.engine_thread = None
     def func_start_button(self):
         velocity = self.first_spinbox.value()
         angle = self.second_spinbox.value()
 
-        self.simulation_signal.emit(velocity, angle)
+        self.engine_thread = PhysicsEngine(velocity, angle)
+        self.engine_thread.update_coordinates.connect(self.simulation_graph.start_animation)
+        self.engine_thread.start()
 class SecondPage(QWidget):
     def __init__(self):
         super().__init__()

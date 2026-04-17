@@ -4,7 +4,7 @@ import math
 from PyQt6.QtCore import QThread, pyqtSignal
 
 class PhysicsEngine(QThread):
-    update_coordinates = pyqtSignal(np.ndarray, np.ndarray)
+    update_coordinates = pyqtSignal(np.ndarray, np.ndarray, np.ndarray)
     def __init__(self, velocity, angle):
         super().__init__()
         self.velocity = velocity
@@ -21,3 +21,7 @@ class PhysicsEngine(QThread):
         time_flight = (2 * V0y) / gravity
 
         t_array = np.linspace(0, time_flight, 100)
+        x_array = V0x * t_array
+        y_array = (V0y * t_array) - ((1/2) * gravity * (t_array**2))
+
+        self.update_coordinates.emit(t_array, x_array, y_array)
