@@ -54,6 +54,8 @@ class FirstPage(QWidget):
         self.start_button = QPushButton("Simülasyonu Başlat")
         self.simulation_graph = SimulationGraph()
 
+        self.first_spinbox.setMaximum(1000)
+        self.second_spinbox.setMaximum(180)
         #gridlayout
         self.grid_layout.addWidget(self.first_label, 0, 0)
         self.grid_layout.addWidget(self.first_spinbox, 0, 1)
