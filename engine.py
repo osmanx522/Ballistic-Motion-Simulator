@@ -1,0 +1,23 @@
+
+import numpy as np
+import math
+from PyQt6.QtCore import QThread, pyqtSignal
+
+class PhysicsEngine(QThread):
+    update_coordinates = pyqtSignal(np.ndarray, np.ndarray)
+    def __init__(self, velocity, angle):
+        super().__init__()
+        self.velocity = velocity
+        self.angle = angle
+    
+    def run(self):
+        gravity = 9.81
+        radian = math.radians(self.angle)
+        cosθ = math.cos(radian)
+        sinθ = math.sin(radian)
+        V0y = self.velocity * sinθ
+        V0x = self.velocity * cosθ
+
+        time_flight = (2 * V0y) / gravity
+
+        t_array = np.linspace(0, time_flight, 100)
