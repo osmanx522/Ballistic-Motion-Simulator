@@ -1,99 +1,71 @@
-# 🚀 Ballistic Motion Simulator (Balistik Hareket Simülatörü)
+# 🚀 Ballistic Motion Simulator (Gerçek Zamanlı Balistik Simülatörü)
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![NumPy](https://img.shields.io/badge/Numpy-777BB4?style=for-the-badge&logo=numpy&logoColor=white)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=pandas&logoColor=black)
+![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?style=for-the-badge&logo=qt&logoColor=white)
 
-Bu proje, temel kinematik prensiplerini kullanarak 2D uzayda eğik atış (projectile motion) hareketini simüle eden ve görselleştiren bir Python uygulamasıdır. **NumPy**'ın vektörel işlem gücü ve **Matplotlib**'in görselleştirme yetenekleri kullanılarak, mühimmatın yörüngesi, uçuş süresi ve menzili yüksek hassasiyetle hesaplanır.
+Bu proje, temel kinematik prensiplerini kullanarak 2D uzayda eğik atış (projectile motion) hareketini simüle eden, modern arayüzlü ve gerçek zamanlı bir Python uygulamasıdır. **PyQt6** ile geliştirilmiş kontrol paneli ve **PyQtGraph** motoru kullanılarak, mühimmatın uçuşu 60 FPS akıcılığında canlandırılır (animate edilir). 
 
-Savunma sanayi algoritmaları ve fizik simülasyonları üzerine geliştirilecek daha kapsamlı bir ekosistemin (Roadmap) ilk adımıdır.
-
----
-
-## 📸 Örnek Çıktı
-
-![Simülasyon Grafiği](assets/ornek.png)
-
-> **Not:** Grafikler `Equal Aspect Ratio` (Eşit Ölçekleme) ile çizildiği için mühimmatın gerçek fiziksel yörüngesini birebir yansıtır.
+Uygulama, hesaplama yükü ile arayüz çizimini birbirinden ayırarak (QThread) donmaların önüne geçen profesyonel bir mimariye (Clean Architecture) sahiptir.
 
 ---
 
-## 🛠️ Özellikler
+## 🛠️ Öne Çıkan Özellikler (V2.0)
 
-* **Vektörel Hesaplama:** `for` döngüleri yerine NumPy dizileri (arrays) kullanılarak yüksek performanslı hesaplama (C seviyesinde hız).
-* **Dinamik Girdi:** Kullanıcıdan alınan `Hız (m/s)` ve `Açı (Derece)` değerlerine göre anlık simülasyon.
-* **Modüler Yapı:** Çıkış süresi, iniş süresi ve anlık konumlar ayrı fonksiyonlar halinde matematiksel olarak modellenmiştir.
-* **Temel Kinematik:** Hava sürtünmesi ihmal edilerek ideal ortamdaki hareket analizi.
+* **Gerçek Zamanlı Simülasyon (Real-Time 60 FPS):** Atışın fizikteki havada kalma süresi ile ekrandaki uçuş süresi saniyesi saniyesine eşlenmiştir. Uzun uçuşlar `np.arange` ile 60 FPS'e uygun zaman adımlarına (dt=1/60) bölünür.
+* **Modern Karanlık Tema (Dark UI / QSS):** Tüm uygulama, harici bir `style.qss` dosyası üzerinden giydirilmiş Cyberpunk tarzı koyu lacivert/parlak turuncu bir arayüze sahiptir.
+* **Multi-Threading Motor (QThread):** Ağır vektörel fizik hesaplamaları `engine.py` içerisinde ayrı bir işlemci parçacığında (Thread) yapılır, arayüz (GUI) asla kasmaz.
+* **Dinamik Radar Başlıkları:** Mermi havada süzülürken anlık *Zaman (s)*, *Yükseklik (m)* ve *Uzaklık (x)* değerleri grafiğin köşesine ve eksenlerine anlık olarak basılır.
+* **Akıllı Ölçekleme & Yuvarlama:** 90 derece (Tam dikey) ve 180 derece (Yatay ters) atışlarda oluşabilecek "Precision Error" (Kayan Nokta Sapması) hataları matematiksel olarak bloke edilmiştir.
 
 ---
 
-## 📐 Matematiksel Model
+## 🧮 Matematiksel Model & Motor
 
-Simülasyon aşağıdaki hareket denklemleri üzerine kuruludur:
+Motorumuz ideal ortam analizi yapar. Hareket denklemleri modüler olarak `engine.py` içinde hesaplanır:
 
 **Yatay Konum ($x$):**
 $$x(t) = v_0 \cdot \cos(\theta) \cdot t$$
 
 **Dikey Konum ($y$):**
-$$y(t) = y_0 + v_0 \cdot \sin(\theta) \cdot t - \frac{1}{2} g t^2$$
+$$y(t) = v_0 \cdot \sin(\theta) \cdot t - \frac{1}{2} g t^2$$
 
-Burada:
-* $v_0$: İlk Hız
-* $\theta$: Atış Açısı (Radyan)
-* $g$: Yerçekimi İvmesi ($9.81 m/s^2$)
+*(Not: Merminin Y eksenindeki ilk hız bileşeni ($V_{0y}$) sıfır veya negatif olursa sistem otomatik olarak atışı iptal eder.)*
+
+---
+
+## 📂 Mimari (Dosya Yapısı)
+
+Proje, yazılım mühendisliği standartlarına (Separation of Concerns) uygun olarak bölünmüştür:
+
+```text
+ballistic-simulator/
+├── main.py          # Uygulama başlatıcısı ve global QSS tema yükleyicisi
+├── gui.py           # PyQt6 Arayüz bileşenleri (Butonlar, Sinyaller, Sayfalar)
+├── engine.py        # QThread tabanlı Fizik/Matematik motoru
+├── graphics.py      # PyQtGraph tabanlı 60 FPS çizim ve animasyon ekranı
+├── style.qss        # Arayüzün CSS tarzı karanlık tema (Dark Mode) kodları
+├── requirements.txt # Gerekli kütüphaneler listesi
+└── README.md        # Proje dokümantasyonu
+```
 
 ---
 
 ## ⚙️ Kurulum ve Kullanım
 
-Projeyi kendi bilgisayarınızda çalıştırmak için:
+Sistemin çok yüksek hızda çizim yapabilmesi için gerekli kütüphaneleri kurmanız gerekmektedir:
 
-1.  **Repoyu Klonlayın:**
+1.  **Gerekli Kütüphaneleri Yükleyin:**
+    Matplotlib kullanımdan kaldırılmış, yerine endüstri standartlarındaki çizim motoru PyQtGraph eklenmiştir.
     ```bash
-    git clone [https://github.com/KULLANICI_ADINIZ/ballistic-simulator.git](https://github.com/KULLANICI_ADINIZ/ballistic-simulator.git)
-    cd ballistic-simulator
+    pip install numpy pyqt6 pyqtgraph
     ```
 
-2.  **Gerekli Kütüphaneleri Yükleyin:**
-    ```bash
-    pip install numpy matplotlib
-    ```
-
-3.  **Simülasyonu Başlatın:**
+2.  **Simülasyonu Başlatın:**
+    Özel temaların ve arayüzün doğru birleştirilmesi için uygulamayı `main.py` üzerinden çalıştırın:
     ```bash
     python main.py
     ```
 
-4.  **Veri Girişi:** Konsol ekranında istenilen `İlk Hız` ve `Açı` değerlerini girin. Grafik otomatik olarak açılacaktır.
-
----
-
-## 🗺️ Roadmap (Geliştirme Planı)
-
-Bu proje yaşayan bir simülasyon kütüphanesi olmayı hedeflemektedir. Gelecek sürümler için planlanan özellikler:
-
-### Faz 1: Fizik Motoru (Tamamlandı ✅)
-- [x] Temel eğik atış simülasyonu.
-- [x] NumPy ile vektörizasyon optimizasyonu.
-- [x] Matplotlib ile görselleştirme.
-
-### Faz 2: İleri Analiz (Geliştirme Aşamasında 🚧)
-- [ ] **Hava Sürtünmesi (Drag Force):** Havanın yoğunluğu ve cismin şekline göre sürtünme katsayısının eklenmesi.
-- [ ] **Rüzgar Etkisi:** Rüzgarın mühimmatı saptırma analizi.
-- [ ] **Karşılaştırmalı Analiz:** Farklı açıların ve hızların aynı grafik üzerinde kıyaslanması (Envelope Graph).
-
-### Faz 3: Kullanıcı Arayüzü (GUI)
-- [ ] **Arayüz Tasarımı:** PyQt5 veya Tkinter ile modern bir kontrol paneli.
-- [ ] **Slider Kontrolü:** Açı ve hızın kaydırıcılarla anlık değiştirilmesi.
-- [ ] **Raporlama:** Sonuçların Excel/PDF olarak dışa aktarılması.
-
----
-
-## 📂 Dosya Yapısı
-
-```text
-ballistic-simulator/
-├── main.py          # Ana simülasyon kodu ve algoritmalar
-├── README.md        # Proje dokümantasyonu
-├── requirements.txt # Gerekli kütüphaneler listesi
-└── assets/          # Ekran görüntüleri ve görseller
+3.  **Kullanım:** 
+    Arayüzdeki **Hız (m/s)** ve **Açı (Derece)** kutucuklarına değerleri girip "Simülasyonu Başlat" butonuna tıklayın. Top yuvarlağı yörünge boyunca süreyle uyumlu olarak hedefine uçacaktır.

@@ -25,8 +25,11 @@ class PhysicsEngine(QThread):
             y_array = np.array([0])
         else:
             time_flight = (2 * V0y) / gravity
+            
+            fps_step = 1.0 / 60
+            t_array = np.arange(0, time_flight, fps_step)
+            t_array = np.append(t_array, time_flight)
 
-            t_array = np.linspace(0, time_flight, 100)
             x_array = V0x * t_array
             y_array = (V0y * t_array) - ((1/2) * gravity * (t_array**2))
 
