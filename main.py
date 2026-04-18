@@ -2,7 +2,7 @@
 """
 Created on Wed Dec 31 19:57:17 2025
 
-@author: osman
+@author: Osman Fadıl Eliyatkın
 
 ~ Y Ekseni Referans Noktası yer seviyesi seçilmiştir
 ~ X Ekseni Referans Noktası atışın başlangıç noktası seçilmiştir
