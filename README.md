@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![NumPy](https://img.shields.io/badge/Numpy-777BB4?style=for-the-badge&logo=numpy&logoColor=white)
 ![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?style=for-the-badge&logo=qt&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 Bu proje, temel kinematik prensiplerini kullanarak 2D uzayda eğik atış (projectile motion) hareketini simüle eden, modern arayüzlü ve gerçek zamanlı bir Python uygulamasıdır. **PyQt6** ile geliştirilmiş kontrol paneli ve **PyQtGraph** motoru kullanılarak, mühimmatın uçuşu 60 FPS akıcılığında canlandırılır (animate edilir). 
 
