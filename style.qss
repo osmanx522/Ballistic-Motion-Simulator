@@ -2,7 +2,7 @@ QWidget {
     background-color: #1E1E2E; 
     color: #FFFFFF; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
+    font-size: 11pt;
 }
 QLabel {
     color: #A6ACCD; 

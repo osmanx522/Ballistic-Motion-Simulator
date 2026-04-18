@@ -59,7 +59,7 @@ class SimulationGraph(pg.PlotWidget):
             max_x = max(self.x_array) if max(self.x_array) > 0 else 1
             max_y = max(self.y_array) if max(self.y_array) > 0 else 1
 
-            self.time_label.setPos(max_x * 0.9, max_y * 0.9)
+            self.time_label.setPos(max_x * 1.2, max_y * 1.2) # Saniye text in grafikteki konumunu belirtir
 
             self.setLabel("left", f"Yükseklik(Y: {y_step[-1]:.2f})")
             self.setLabel("bottom", f"Mesafe(X: {x_step[-1]:.2f})")
