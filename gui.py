@@ -1,6 +1,6 @@
 
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 
 from engine import PhysicsEngine
 from graphics import SimulationGraph
@@ -41,26 +41,43 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
 class FirstPage(QWidget):
-    simulation_signal = pyqtSignal(float, float)
     def __init__(self):
         super().__init__()
 
         self.main_layout = QVBoxLayout(self)
         self.grid_layout = QGridLayout()
+
         self.first_label = QLabel("Hız Değeri")
         self.second_label = QLabel("Açı Değeri")
+
         self.first_spinbox = QDoubleSpinBox()
+        self.first_spinbox.setMaximum(1000)
         self.second_spinbox = QDoubleSpinBox()
+        self.second_spinbox.setMaximum(180)
+
         self.start_button = QPushButton("Simülasyonu Başlat")
         self.simulation_graph = SimulationGraph()
 
-        self.first_spinbox.setMaximum(1000)
-        self.second_spinbox.setMaximum(180)
+        self.fps_label = QLabel("FPS: 60")
+        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
+        self.fps_slider.setMinimum(30)
+        self.fps_slider.setMaximum(240)
+        self.fps_slider.setValue(60)
+        self.fps_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.fps_slider.setTickInterval(30)
+        self.fps_slider.valueChanged.connect(lambda v: self.fps_label.setText(f"FPS: {v}"))
+        
+
         #gridlayout
         self.grid_layout.addWidget(self.first_label, 0, 0)
         self.grid_layout.addWidget(self.first_spinbox, 0, 1)
+
         self.grid_layout.addWidget(self.second_label, 1, 0)
         self.grid_layout.addWidget(self.second_spinbox, 1, 1)
+
+        self.grid_layout.addWidget(self.fps_label, 2,0)
+        self.grid_layout.addWidget(self.fps_slider, 2,1)
+
         self.main_layout.addLayout(self.grid_layout)
 
         #button
@@ -75,8 +92,9 @@ class FirstPage(QWidget):
     def func_start_button(self):
         velocity = self.first_spinbox.value()
         angle = self.second_spinbox.value()
-
-        self.engine_thread = PhysicsEngine(velocity, angle)
+        
+        selection_fps = int(self.fps_slider.value())
+        self.engine_thread = PhysicsEngine(velocity, angle, selection_fps)
         self.engine_thread.update_coordinates.connect(self.simulation_graph.start_animation)
         self.engine_thread.start()
 class SecondPage(QWidget):
