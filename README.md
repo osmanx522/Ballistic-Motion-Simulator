@@ -5,6 +5,20 @@
 ![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?style=for-the-badge&logo=qt&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+---
+
+## 🎯 Geliştiricinin Notu (Neden Bu Projeyi Geliştirdim?)
+
+Bir **Yapay Zeka Mühendisliği öğrencisi** olarak hazır kütüphanelerin sunduğu konfor alanından çıkmak ve arka planda çalışan matematiği/mimariyi bizzat kodlayarak kavramak en büyük motivasyonumdu. Özellikle **Savunma Sanayii** ve **Oyun Motorları** gibi yüksek performans gerektiren alanlara olan ilgim doğrultusunda bu projeyi bir laboratuvar gibi kullandım.
+
+Bu simülatörü geliştirirken elde ettiğim temel kazanımlar şunlardır:
+- Sadece teorik fizikteki analitik formüllerin (Kalkülüs) hava direnci devredeyken yetersiz kaldığını görerek, sorunu **Sayısal İntegrasyon (Euler Metodu)** ile çözmeyi öğrendim.
+- Arayüz ile hesaplamanın birbirini kilitlememesi için (Multithreading) **QThread** yapısını uyguladım.
+- Yazılımın donanım performansından (FPS düşüşleri) bağımsız olarak mükemmel zamanlama ile çalışması gerektiğini fark edip, oyun endüstrisinin standartlarından olan **Delta-Time Render Loop** mentalitesini projeye entegre ettim.
+
+Bu proje, bir hesap makinesinden öte, "Bilgisayarın saniye saniye simüle ettiği fizik kurallarını" ve "yazılım mimarisini" kod satırlarıyla keşfettiğim bir öğrenme yolculuğudur.
+
+---
 Bu proje, temel kinematik prensiplerini ve **Akışkanlar Mekaniğine (Fluid Dynamics)** dayalı hava sürtünmesi (Drag) kurallarını kullanarak 2D uzayda eğik atış hareketini simüle eden profesyonel bir Python uçuş simülatörüdür. 
 
 Özellikle Savunma Sanayi ve Oyun Motoru mimarilerine uygun olarak; **Sayısal İntegrasyon (Euler Metodu)**, **QThread ile Multithreading** ve FPS bağımlılığını ortadan kaldıran **Delta-Time Game Loop** prensipleriyle (Sıfırdan) geliştirilmiştir.
