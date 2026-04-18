@@ -5,7 +5,9 @@
 ![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?style=for-the-badge&logo=qt&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-Bu proje, temel kinematik prensiplerini kullanarak 2D uzayda eğik atış (projectile motion) hareketini simüle eden, modern arayüzlü ve gerçek zamanlı bir Python uygulamasıdır. **PyQt6** ile geliştirilmiş kontrol paneli ve **PyQtGraph** motoru kullanılarak, mühimmatın uçuşu 60 FPS akıcılığında canlandırılır (animate edilir). 
+Bu proje, temel kinematik prensiplerini ve **Akışkanlar Mekaniğine (Fluid Dynamics)** dayalı hava sürtünmesi (Drag) kurallarını kullanarak 2D uzayda eğik atış hareketini simüle eden profesyonel bir Python uçuş simülatörüdür. 
+
+Özellikle Savunma Sanayi ve Oyun Motoru mimarilerine uygun olarak; **Sayısal İntegrasyon (Euler Metodu)**, **QThread ile Multithreading** ve FPS bağımlılığını ortadan kaldıran **Delta-Time Game Loop** prensipleriyle (Sıfırdan) geliştirilmiştir.
 
 Uygulama, hesaplama yükü ile arayüz çizimini birbirinden ayırarak (QThread) donmaların önüne geçen profesyonel bir mimariye (Clean Architecture) sahiptir.
 
@@ -13,25 +15,31 @@ Uygulama, hesaplama yükü ile arayüz çizimini birbirinden ayırarak (QThread)
 
 ## 🛠️ Öne Çıkan Özellikler (V2.0)
 
-* **Gerçek Zamanlı Simülasyon (Real-Time 60 FPS):** Atışın fizikteki havada kalma süresi ile ekrandaki uçuş süresi saniyesi saniyesine eşlenmiştir. Uzun uçuşlar `np.arange` ile 60 FPS'e uygun zaman adımlarına (dt=1/60) bölünür.
-* **Modern Karanlık Tema (Dark UI / QSS):** Tüm uygulama, harici bir `style.qss` dosyası üzerinden giydirilmiş Cyberpunk tarzı koyu lacivert/parlak turuncu bir arayüze sahiptir.
-* **Multi-Threading Motor (QThread):** Ağır vektörel fizik hesaplamaları `engine.py` içerisinde ayrı bir işlemci parçacığında (Thread) yapılır, arayüz (GUI) asla kasmaz.
-* **Dinamik Radar Başlıkları:** Mermi havada süzülürken anlık *Zaman (s)*, *Yükseklik (m)* ve *Uzaklık (x)* değerleri grafiğin köşesine ve eksenlerine anlık olarak basılır.
-* **Akıllı Ölçekleme & Yuvarlama:** 90 derece (Tam dikey) ve 180 derece (Yatay ters) atışlarda oluşabilecek "Precision Error" (Kayan Nokta Sapması) hataları matematiksel olarak bloke edilmiştir.
+* **Aerodinamik Sürtünme ve Akışkanlar Mekaniği (Tam Akademik Model):** Merminin *Kütlesi (kg)*, *Rüzgar Alanı (m²)* ve *Aerodinamik Şekil Katsayısı (Cd)* hesaba katılarak rüzgar direnci hesaplanır. Kapalı matematik formülleri ($x = v \cdot t$) yerine, her mili-saniyede hızın azaldığı **Euler İntegrasyonu (Sayısal Analiz)** döngüsü kullanılarak gerçekçi, asimetrik mermi yörüngeleri elde edilir.
+* **Delta-Time Game Loop (Zaman Bağımsız Çizim):** Çizim motoru `QTimer` gecikmelerine (`Thread Sleep` / İşletim Sistemi Sapması) yenik düşmez. `time.time()` ve `numpy.searchsorted` algoritmaları sayesinde ekran FPS'i düşse bile (Frame Skipping) simülasyon tam zamanında ve doğru koordinatta gerçek zamanlı (Real-Time) biter.
+* **Seçilebilir FPS (Tick Rate) ve A/B Testi:** Arayüzdeki FPS kaydırıcısı ile donanımsal çizim hızı (30 FPS - 240 FPS) anlık ayarlanabilir. Sürtünmesiz (İdeal Formül) ve Sürtünmeli (Dinamik Motor) algoritmalar arası tek tıkla geçiş (Backward Compatibility) yapılabilir.
+* **Modern Karanlık Tema (Dark UI / QSS):** Tüm uygulama, harici bir `style.qss` dosyası üzerinden giydirilmiş Cyberpunk tarzı koyu lacivert/parlak turuncu bir arayüze sahiptir. Kullanılmayan girdi kutuları profesyonel UX prensipleri ile anında kilitlenir (`setEnabled(False)`).
+* **Multi-Threading Motor (QThread):** Ağır diferansiyel fizik hesaplamaları `engine.py` içerisinde ayrı bir işlemci parçacığında (Thread) yapılır, arayüz (GUI) pürüzsüz çalışır.
 
 ---
 
 ## 🧮 Matematiksel Model & Motor
 
-Motorumuz ideal ortam analizi yapar. Hareket denklemleri modüler olarak `engine.py` içinde hesaplanır:
+Motorumuz iki farklı modele sahiptir ("Geriye Dönük Uyumluluk"):
 
-**Yatay Konum ($x$):**
-$$x(t) = v_0 \cdot \cos(\theta) \cdot t$$
+### 1. İdeal (Sürtünmesiz) Mod:
+Klasik lise/üniversite analitik denklemleri kullanılır ($x = V \cdot \cos(\theta) \cdot t$). Matris çarpımları ile anında hedef bulunur.
 
-**Dikey Konum ($y$):**
-$$y(t) = v_0 \cdot \sin(\theta) \cdot t - \frac{1}{2} g t^2$$
+### 2. Gelişmiş Balistik (Euler) Modu:
+Gerçek uzayda rüzgarın anlık itme kuvveti şu formülle (Kalkülüs) adım adım işlenir:
+$$F_{drag} = \frac{1}{2} \cdot \rho \cdot V^2 \cdot C_d \cdot A$$
 
-*(Not: Merminin Y eksenindeki ilk hız bileşeni ($V_{0y}$) sıfır veya negatif olursa sistem otomatik olarak atışı iptal eder.)*
+Motor bu formülü her donanım adımında ($dt$) şu şekilde uygular:
+1. $a = \frac{-F_{drag}}{m}$ (İvmenin eksi yönde hızı kesmesi)
+2. $V_{new} = V_{current} + a \cdot dt$
+3. $Pos_{new} = Pos_{current} + V_{new} \cdot dt$
+
+Bu sayede mermi tepe noktasından sonra sert bir asimetrik düşüş (Paraşüt Etkisi) yaşar.
 
 ---
 
